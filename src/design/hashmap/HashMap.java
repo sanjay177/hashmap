@@ -2,16 +2,16 @@ package design.hashmap;
 
 public class HashMap<K, V> {
     private final Integer INITIAL_CAPACITY = 16;
-    V[] table;
+    private Bucket<K,V>[] table;
 
    @SuppressWarnings("unchecked")
     public HashMap() {
-        table = (V[]) new Object[INITIAL_CAPACITY];
+        table = new Bucket[INITIAL_CAPACITY];
     }
 
     @SuppressWarnings("unchecked")
     public HashMap(int initialCapacity) {
-        table = (V[]) new Object[initialCapacity];
+        table = new Bucket[initialCapacity];
     }
 
     private int index(int hashCode) {
@@ -21,19 +21,37 @@ public class HashMap<K, V> {
     public V get(K key) {
        int hashCode = hash(key);
        int index = index(hashCode);
-       return table[index];
+       Bucket<K, V> recordAtIndex = table[index];
+       return recordAtIndex.getValueByKey(key);
+
     }
 
     public void put(K key, V value) {
         int hashCode = hash(key);
         int index = index(hashCode);
-        table[index] = value;
+        Node<K,V> node = new Node<>();
+        node.setHashCode(hashCode);
+        node.setKey(key);
+        node.setValue(value);
+        Bucket<K,V> bucket;
+        if(table[index] == null) {
+            bucket = new Bucket<>();
+        } else {
+            bucket = table[index];
+        }
+        bucket.addNodeToList(node);
+        table[index] = bucket;
     }
 
     public void remove(K key) {
         int hashCode = hash(key);
         int index = index(hashCode);
-        table[index] = null;
+        if(table[index] == null ) {
+            return;
+        } else {
+            Bucket<K,V> bucket = table[index];
+            bucket.removeByKey(key);
+        }
     }
 
 
